@@ -10,6 +10,7 @@ import os
 import operator
 # imported because I can't use java based Porter stemmer
 from nltk.stem import PorterStemmer
+import itertools
 
 # TODO: Reformat entire code into functions and modules
 # create list of stopwords
@@ -27,6 +28,7 @@ word = []
 # dictionary to count frequency of tokens/words
 word_list = {}
 porter = PorterStemmer()
+count = 0
 
 # TODO: ask for directory of text(s)
 # opening files in directory citeseer/
@@ -45,6 +47,7 @@ with os.scandir('citeseer') as filenames:
                         else:
                             # completed token/word
                             current_word = ''.join(word)
+                            count += 1
                             # clearing word list to create new word
                             word.clear()
                             # filters stopwords
@@ -55,14 +58,31 @@ with os.scandir('citeseer') as filenames:
                                     # initializes a dictionary entry
                                     word_list[current_word] = 1
                                 else:
-                                    # adds to the frequency of the dictionary \
-                                    # entry
+                                    # adds to the frequency of the dictionary entry
                                     word_list[current_word] += 1
             f.close()
 
 # sorts word_list by value as a list of tuples and types as a dictionary
-sorted_dictionary = dict(sorted(word_list.items(), key=operator.itemgetter(1)))
-                                # , reverse=True))  # show in ascending order
+sorted_dictionary = dict(sorted(word_list.items(), key=operator.itemgetter(1),
+                                reverse=True))
 sorted_dictionary.pop('')
-for keys, values in sorted_dictionary.items():
-    print(keys, values)
+
+# following bits of code help answer the questions in the readme
+# for keys, values in sorted_dictionary.items():
+#     print(keys, values)
+print(count)
+
+print(len(sorted_dictionary))
+
+for k, v in dict(itertools.islice(sorted_dictionary.items(), 20)).items():
+    print(k, v)
+
+fifteen_percent = count * 0.15
+min_unique = 0
+for v in sorted_dictionary:
+    min_unique += 1
+    fifteen_percent -= sorted_dictionary[v]
+    if fifteen_percent < 0:
+        break
+
+print(min_unique)
